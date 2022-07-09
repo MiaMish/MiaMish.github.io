@@ -8,6 +8,17 @@
 <h1>
     <p>Similarity Biased</p>
 </h1>
+
+<h2><p>Parameter Setup 🧰️</p></h2>
+<div class="setup">
+    <div>Number of agents: <b>50</b></div>
+    <div>Number of iterations: <b>2,000</b></div>
+    <div>Every step in the animation represents <b>100</b> iterations</div>
+    <div>μ (Mu): <b>0.4</b></div>
+    <div>ε (Epsilon): <b>0.3</b></div>
+    <div>Number of repetitions: <b>10</b></div>
+</div>
+
 <h2>
     <p>Vanilla 🍦</p>
 </h2>
@@ -17,7 +28,7 @@
 <h2>
     <p>Radical Exposure 📸️</p>
 </h2>
-<p>Running the model with diff values for η (Eta).</p>
+<p>Running the model with different values for η (Eta).</p>
 
 <div class="exposure">
     <img src="polarization-gifs/Similarity - Radical Exposure (eta=0.2).gif"/>
@@ -38,28 +49,52 @@
 
 <table>
     <tr>
-        <td><img src="polarization-gifs/Similarity - Switch Agents (rate=5, std=0.2).gif"/></td>
+        <td class="columnTitle">std=0.2</td>
+        <td class="columnTitle">std=0.6</td>
+    </tr>
+    <tr>
+        <td>
+            <div class="row">
+                <div class="rowTitle">rate=5</div>
+                <img src="polarization-gifs/Similarity - Switch Agents (rate=5, std=0.2).gif"/>
+            </div>
+        </td>
         <td><img src="polarization-gifs/Similarity - Switch Agents (rate=5, std=0.6).gif"/></td>
     </tr>
     <tr>
         <td class="arrow" colspan="2">⭣</td>
     </tr>
     <tr>
-        <td><img src="polarization-gifs/Similarity - Switch Agents (rate=10, std=0.2).gif"/></td>
+        <td>
+            <div class="row">
+                <div class="rowTitle">rate=10</div>
+                <img src="polarization-gifs/Similarity - Switch Agents (rate=10, std=0.2).gif"/>
+            </div>
+        </td>
         <td><img src="polarization-gifs/Similarity - Switch Agents (rate=10, std=0.6).gif"/></td>
     </tr>
     <tr>
         <td class="arrow" colspan="2">⭣</td>
     </tr>
     <tr>
-        <td><img src="polarization-gifs/Similarity - Switch Agents (rate=30, std=0.2).gif"/></td>
+        <td>
+            <div class="row">
+                <div class="rowTitle">rate=30</div>
+                <img src="polarization-gifs/Similarity - Switch Agents (rate=30, std=0.2).gif"/>
+            </div>
+        </td>
         <td><img src="polarization-gifs/Similarity - Switch Agents (rate=30, std=0.6).gif"/></td>
     </tr>
     <tr>
         <td class="arrow" colspan="2">⭣</td>
     </tr>
     <tr>
-        <td><img src="polarization-gifs/Similarity - Switch Agents (rate=100, std=0.2).gif"/></td>
+        <td>
+            <div class="row">
+                <div class="rowTitle">rate=100</div>
+                <img src="polarization-gifs/Similarity - Switch Agents (rate=100, std=0.2).gif"/>
+            </div>
+        </td>
         <td><img src="polarization-gifs/Similarity - Switch Agents (rate=100, std=0.6).gif"/></td>
     </tr>
 </table>

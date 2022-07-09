@@ -50,6 +50,38 @@ td {
     vertical-align: middle;
 }
 
-td:first-child:not(.arrow) {
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.rowTitle {
+    color: #3c4f8b;
+    font-weight: bold;
+    margin-top: 120px;
+}
+
+.columnTitle {
+    color: #3c4f8b;
+    font-weight: bold;
+}
+
+td:first-child:not(.arrow):not(.columnTitle) {
     border-right: 2px #1f988b solid;
+}
+
+.setup {
+    background-color: #f5caff;
+    width: 320px;
+    padding-bottom: 12px;
+    padding-left: 12px;
+    border-radius: 12px;
+}
+.setup div {
+    padding-top: 12px;
+}
+
+tr .arrow {
+    padding-left: 62px;
+    color: #460456;
 }
