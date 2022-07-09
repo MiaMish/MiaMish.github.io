@@ -1,0 +1,55 @@
+body {
+    padding: 12px;
+    font-family: Arial;
+    font-size: 12px;
+}
+
+h1 > p {
+    color: white;
+    background-color: #1f988b;
+    display: inline;
+    padding: 12px;
+    border-radius: 4px;
+}
+
+h2 {
+    margin-top: 32px;
+}
+
+h2 > p {
+    background-color: #fffa9c;
+    display: inline;
+    padding: 12px;
+    border-radius: 4px;
+}
+
+.exposure {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    max-width: 700px;
+}
+
+.arrow {
+    font-size: 32px;
+    font-weight: bold;
+    color: #1f988b;
+}
+
+img {
+    object-fit: cover;
+    object-position: right;
+    width: 320px;
+    height: 288px;
+}
+
+td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+td:first-child:not(.arrow) {
+    border-right: 2px #1f988b solid;
+}
