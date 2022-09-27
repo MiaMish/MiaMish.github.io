@@ -13,10 +13,14 @@
 
 <hr>
 <div class="center">
-    <select id="simulation_type" onchange="fillExperimentsDropDown()">
+    <label for="simulation_type">Simulation Type:</label><select id="simulation_type" onchange="fillConfigsFilter();fillExperimentsDropDown();">
         <option value="SIMILARITY" selected>SIMILARITY</option>
         <option value="REPULSIVE">REPULSIVE</option>
         <option value="ASSIMILATION">ASSIMILATION</option>
+    </select>
+    <label for="num_of_agents">Num of Agents</label><select id="num_of_agents" onchange="fillExperimentsDropDown()">
+    </select>
+    <label for="num_of_iterations">Num of Iterations:</label><select id="num_of_iterations" onchange="fillExperimentsDropDown()">
     </select>
 </div>
 <hr>
@@ -93,8 +97,6 @@
 
     const BASE_PATH = "https://raw.githubusercontent.com/MiaMish/topographic-polarization/master/polarization_mechnisms/resources/database/"
     const CONFIGS_ATTR_TO_DISPLAY = [
-        {display_name: "Num of Agents", api_name: "num_of_agents"},
-        {display_name: "Num of Iterations", api_name: "num_iterations"},
         {display_name: "Mio", api_name: "mio"},
         {display_name: "Num of Repetitions", api_name: "num_of_repetitions"},
         {display_name: "Switch Agent Rate", api_name: "switch_agent_rate"},
@@ -144,7 +146,7 @@
         CONFIGS_ATTR_TO_DISPLAY.forEach(attr => {
             let row = table.insertRow(table.rows.length);
             let cellLeft = row.insertCell(0);
-            cellLeft.innerText = attr.display_name
+            cellLeft.innerText = attr.display_name;
             let cellRight = row.insertCell(1);
             cellRight.id = `${attr.api_name}_${seriesIndex}`;
         })
@@ -172,9 +174,11 @@
             let experimentResults = values[0];
             let experimentConfigs = values[1];
             let options_for_select = experimentConfigs
-                .filter(experimentConfig => experimentConfig.config_id
-                    && experimentConfig.config_id !== ''
-                    && experimentConfig["simulation_type"] === document.getElementById("simulation_type").value)
+                .filter(experimentConfig => experimentConfig["config_id"]
+                    && experimentConfig.config_id !== ""
+                    && experimentConfig["simulation_type"] === document.getElementById("simulation_type").value
+                    && experimentConfig["num_of_agents"] === document.getElementById("num_of_agents").value
+                    && experimentConfig["num_iterations"] === document.getElementById("num_of_iterations").value)
                 .map(experimentConfig => {
                     let configId = experimentConfig["config_id"];
                     let displayName = experimentConfig.display_name;
@@ -199,6 +203,40 @@
             });
 
         });
+    }
+
+    function removeAllOptionsFromSelectElement(selectElement) {
+        let L = selectElement.options.length - 1;
+        for (let i = L; i >= 0; i--) {
+            selectElement.remove(i);
+        }
+    }
+
+    function fillConfigsFilter() {
+        getCsvData(BASE_PATH + "experiment_configs")
+            .then(data => {
+                let filtered_list = data.filter(item => item["simulation_type"] === document.getElementById("simulation_type").value);
+                let selectElement = document.getElementById("num_of_agents");
+                removeAllOptionsFromSelectElement(selectElement);
+                filtered_list.map(item => item["num_of_agents"])
+                    .filter((value, index, self) => self.indexOf(value) === index)
+                    .forEach(num_of_agents => {
+                        let opt = document.createElement('option');
+                        opt.value = num_of_agents;
+                        opt.innerHTML = num_of_agents;
+                        selectElement.appendChild(opt);
+                    });
+                selectElement = document.getElementById("num_of_iterations");
+                removeAllOptionsFromSelectElement(selectElement);
+                filtered_list.map(item => item["num_iterations"])
+                    .filter((value, index, self) => self.indexOf(value) === index)
+                    .forEach(num_iterations => {
+                        let opt = document.createElement('option');
+                        opt.value = num_iterations;
+                        opt.innerHTML = num_iterations;
+                        selectElement.appendChild(opt);
+                    });
+            })
     }
 
     function generateChart() {
@@ -226,6 +264,7 @@
             })
     }
 
+    fillConfigsFilter();
     fillExperimentsDropDown();
     for (let seriesIndex = 1; seriesIndex <= 5; seriesIndex++) {
         buildConfigAttributesDisplayTable(seriesIndex);
