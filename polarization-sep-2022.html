@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>September 2022</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.1.0/papaparse.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-base.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-data-adapter.min.js"></script>
+    <link rel="stylesheet" href="style_september_2022.css">
+</head>
+<body>
+
+<hr>
+<div class="center">
+    <select id="simulation_type" onchange="fillExperimentsDropDown()">
+        <option value="SIMILARITY" selected>SIMILARITY</option>
+        <option value="REPULSIVE">REPULSIVE</option>
+        <option value="ASSIMILATION">ASSIMILATION</option>
+    </select>
+</div>
+<hr>
+<div class="center">
+    <div class="series_config">
+        <input type="checkbox" id="series_1_enabled" onchange="enableToggleChanged(1)" checked>Enabled</input>
+        <div id="series_1_div">
+            <select id="series_1_experiment_id" class="select_experiment" onchange="renderConfigsSeries(1)">
+            </select>
+            <table id="series_1_experiment_table">
+            </table>
+        </div>
+    </div>
+
+    <div class="series_config">
+        <input type="checkbox" id="series_2_enabled" onchange="enableToggleChanged(2)" checked>Enabled</input>
+        <div id="series_2_div">
+            <select id="series_2_experiment_id" class="select_experiment" onchange="renderConfigsSeries(2)">
+            </select>
+            <table id="series_2_experiment_table">
+            </table>
+        </div>
+    </div>
+
+    <div class="series_config">
+        <input type="checkbox" id="series_3_enabled" onchange="enableToggleChanged(3)" checked>Enabled</input>
+        <div id="series_3_div">
+            <select id="series_3_experiment_id" class="select_experiment" onchange="renderConfigsSeries(3)">
+            </select>
+            <table id="series_3_experiment_table">
+            </table>
+        </div>
+    </div>
+
+</div>
+<div class="center">
+    <div class="series_config">
+        <input type="checkbox" id="series_4_enabled" onchange="enableToggleChanged(4)" checked>Enabled</input>
+        <div id="series_4_div">
+            <select id="series_4_experiment_id" class="select_experiment" onchange="renderConfigsSeries(4)">
+            </select>
+            <table id="series_4_experiment_table">
+            </table>
+        </div>
+    </div>
+
+    <div class="series_config">
+        <input type="checkbox" id="series_5_enabled" onchange="enableToggleChanged(5)" checked>Enabled</input>
+        <div id="series_5_div">
+            <select id="series_5_experiment_id" class="select_experiment" onchange="renderConfigsSeries(5)">
+            </select>
+            <table id="series_5_experiment_table">
+            </table>
+        </div>
+    </div>
+
+</div>
+<hr>
+<div class="center">
+    <select id="measurement_type">
+        <option value="SPREAD" selected>SPREAD</option>
+        <option value="DISPERSION">DISPERSION</option>
+    </select>
+</div>
+<div class="center">
+    <button onclick="generateChart()">
+        Create Chart!
+    </button>
+</div>
+<hr>
+<div id="chart_container" class="chart_container"></div>
+</body>
+<script>
+
+    const BASE_PATH = "https://raw.githubusercontent.com/MiaMish/topographic-polarization/master/polarization_mechnisms/resources/database/"
+    const CONFIGS_ATTR_TO_DISPLAY = [
+        {display_name: "Num of Agents", api_name: "num_of_agents"},
+        {display_name: "Num of Iterations", api_name: "num_iterations"},
+        {display_name: "Mio", api_name: "mio"},
+        {display_name: "Num of Repetitions", api_name: "num_of_repetitions"},
+        {display_name: "Switch Agent Rate", api_name: "switch_agent_rate"},
+        {display_name: "Switch Agent Sigma", api_name: "switch_agent_sigma"},
+        {display_name: "Radical Exposure Eta", api_name: "radical_exposure_eta"},
+        {display_name: "Truncated At", api_name: "truncate_at"},
+        {display_name: "Epsilon", api_name: "epsilon"},
+        {display_name: "Mark Stubborn Ar", api_name: "mark_stubborn_at"},
+    ];
+    const SCATTER_COLORS = [
+        "#782372",
+        "#B52B2B",
+        "#182EB2",
+        "#E48C1B",
+        "#34912D"
+    ]
+
+    function getCsvData(path_to_csv) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                // url: "https://raw.githubusercontent.com/WaydeHerman/ScatterPlot/master/data.csv",
+                url: path_to_csv,
+                success: function (csv) {
+                    const output = Papa.parse(csv, {
+                        header: true, // Convert rows to Objects using headers as properties
+                    });
+                    resolve(output.data);
+                },
+                error: function (error) {
+                    reject(error)
+                },
+            });
+        });
+    }
+
+    function enableToggleChanged(seriesIndex) {
+        document.getElementById(`series_${seriesIndex}_div`).hidden = !document.getElementById(`series_${seriesIndex}_enabled`).checked;
+    }
+
+    function buildConfigAttributesDisplayTable(seriesIndex) {
+        let table = document.getElementById(`series_${seriesIndex}_experiment_table`);
+        let row = table.insertRow(table.rows.length);
+        let cellLeft = row.insertCell(0);
+        cellLeft.innerText = 'Attribute';
+        let cellRight = row.insertCell(1);
+        cellRight.innerText = 'Value';
+        CONFIGS_ATTR_TO_DISPLAY.forEach(attr => {
+            let row = table.insertRow(table.rows.length);
+            let cellLeft = row.insertCell(0);
+            cellLeft.innerText = attr.display_name
+            let cellRight = row.insertCell(1);
+            cellRight.id = `${attr.api_name}_${seriesIndex}`;
+        })
+    }
+
+    function renderConfigsSeries(seriesIndex) {
+        getCsvData(BASE_PATH + "experiment_result")
+            .then(data => {
+                let seriesExperimentResult = data.filter(item => item.experiment_id === document.getElementById(`series_${seriesIndex}_experiment_id`).value);
+                return seriesExperimentResult[0]["config_id"];
+            }).then(configId => {
+            getCsvData(BASE_PATH + "experiment_configs")
+                .then(data => {
+                    return data.filter(item => item["config_id"] === configId)[0];
+                }).then(seriesConfig => {
+                CONFIGS_ATTR_TO_DISPLAY.forEach(attr => {
+                    document.getElementById(`${attr.api_name}_${seriesIndex}`).innerHTML = seriesConfig[attr.api_name];
+                })
+            })
+        })
+    }
+
+    function fillExperimentsDropDown() {
+        Promise.all([getCsvData(BASE_PATH + "experiment_result"), getCsvData(BASE_PATH + "experiment_configs")]).then((values) => {
+            let experimentResults = values[0];
+            let experimentConfigs = values[1];
+            let options_for_select = experimentConfigs
+                .filter(experimentConfig => experimentConfig.config_id
+                    && experimentConfig.config_id !== ''
+                    && experimentConfig["simulation_type"] === document.getElementById("simulation_type").value)
+                .map(experimentConfig => {
+                    let configId = experimentConfig["config_id"];
+                    let displayName = experimentConfig.display_name;
+                    let experimentsForConfig = experimentResults.filter(experiment_result => experiment_result["config_id"] === configId)
+                        .sort((result, other) => other.timestamp - result.timestamp);
+                    let experimentId = experimentsForConfig[0].experiment_id;
+                    return {display_name: displayName, experiment_id: experimentId};
+                });
+
+            let selects = document.getElementsByClassName("select_experiment");
+            Array.prototype.forEach.call(selects, function (selectElement) {
+                let i, L = selectElement.options.length - 1;
+                for (i = L; i >= 0; i--) {
+                    selectElement.remove(i);
+                }
+                options_for_select.forEach(optionToAppend => {
+                    let opt = document.createElement('option');
+                    opt.value = optionToAppend.experiment_id;
+                    opt.innerHTML = optionToAppend.display_name;
+                    selectElement.appendChild(opt);
+                })
+            });
+
+        });
+    }
+
+    function generateChart() {
+        document.getElementById("chart_container").innerHTML = "";
+        getCsvData(BASE_PATH + "measurements")
+            .then(data => {
+                let chart = anychart.scatter();
+                for (let seriesIndex = 1; seriesIndex <= 5; seriesIndex++) {
+                    let isEnabled = document.getElementById(`series_${seriesIndex}_enabled`).checked;
+                    if (!isEnabled) {
+                        continue;
+                    }
+                    let selectElement = document.getElementById(`series_${seriesIndex}_experiment_id`)
+                    let seriesData = data.filter(item =>
+                        item.experiment_id === selectElement.value
+                        && item.measurement_type === document.getElementById("measurement_type").value
+                    ).map(item => ({x: item.x, value: item.value}));
+                    let seriesMarker = chart.marker(seriesData);
+                    seriesMarker.normal().fill(SCATTER_COLORS[seriesIndex]);
+                    seriesMarker.name(selectElement.getElementsByTagName("option")[selectElement.selectedIndex].innerHTML);
+                }
+                let legend = chart.legend();
+                legend.enabled(true);
+                chart.container("chart_container").draw();
+            })
+    }
+
+    fillExperimentsDropDown();
+    for (let seriesIndex = 1; seriesIndex <= 5; seriesIndex++) {
+        buildConfigAttributesDisplayTable(seriesIndex);
+        renderConfigsSeries(seriesIndex);
+    }
+
+</script>
+</html>
