@@ -80,18 +80,47 @@
 </div>
 <hr>
 <div class="center">
-    <select id="measurement_type">
+    <select id="measurement_type_1">
         <option value="SPREAD" selected>SPREAD</option>
         <option value="DISPERSION">DISPERSION</option>
+        <option value="NUM_OF_LOCAL_MAX">NUM_OF_LOCAL_MAX</option>
+        <option value="COVERED_BINS">COVERED_BINS</option>
+        <option value="DISCONNECT_INDEX">DISCONNECT_INDEX</option>
+    </select>
+    <select id="measurement_type_2">
+        <option value="SPREAD" selected>SPREAD</option>
+        <option value="DISPERSION">DISPERSION</option>
+        <option value="NUM_OF_LOCAL_MAX">NUM_OF_LOCAL_MAX</option>
+        <option value="COVERED_BINS">COVERED_BINS</option>
+        <option value="DISCONNECT_INDEX">DISCONNECT_INDEX</option>    </select>
+    <select id="measurement_type_3">
+        <option value="SPREAD" selected>SPREAD</option>
+        <option value="DISPERSION">DISPERSION</option>
+        <option value="NUM_OF_LOCAL_MAX">NUM_OF_LOCAL_MAX</option>
+        <option value="COVERED_BINS">COVERED_BINS</option>
+        <option value="DISCONNECT_INDEX">DISCONNECT_INDEX</option>    </select>
+    <select id="measurement_type_4">
+        <option value="SPREAD" selected>SPREAD</option>
+        <option value="DISPERSION">DISPERSION</option>
+        <option value="NUM_OF_LOCAL_MAX">NUM_OF_LOCAL_MAX</option>
+        <option value="COVERED_BINS">COVERED_BINS</option>
+        <option value="DISCONNECT_INDEX">DISCONNECT_INDEX</option>
     </select>
 </div>
 <div class="center">
-    <button onclick="generateChart()">
-        Create Chart!
+    <button onclick="generateCharts()">
+        Create Charts!
     </button>
 </div>
 <hr>
-<div id="chart_container" class="chart_container"></div>
+<div class="center">
+    <div id="chart_container_1" class="chart_container"></div>
+    <div id="chart_container_2" class="chart_container"></div>
+</div>
+<div class="center">
+    <div id="chart_container_3" class="chart_container"></div>
+    <div id="chart_container_4" class="chart_container"></div>
+</div>
 </body>
 <script>
 
@@ -239,8 +268,12 @@
             })
     }
 
-    function generateChart() {
-        document.getElementById("chart_container").innerHTML = "";
+    function generateCharts() {
+        for (let chartIndex = 1; chartIndex <= 4; chartIndex++) {
+            generateChart(chartIndex)
+        }
+    }
+    function generateChart(chartIndex) {
         getCsvData(BASE_PATH + "measurements")
             .then(data => {
                 let chart = anychart.scatter();
@@ -252,7 +285,7 @@
                     let selectElement = document.getElementById(`series_${seriesIndex}_experiment_id`)
                     let seriesData = data.filter(item =>
                         item.experiment_id === selectElement.value
-                        && item.measurement_type === document.getElementById("measurement_type").value
+                        && item.measurement_type === document.getElementById(`measurement_type_${chartIndex}`).value
                     ).map(item => ({x: item.x, value: item.value}));
                     let seriesMarker = chart.marker(seriesData);
                     seriesMarker.normal().fill(SCATTER_COLORS[seriesIndex]);
@@ -260,7 +293,8 @@
                 }
                 let legend = chart.legend();
                 legend.enabled(true);
-                chart.container("chart_container").draw();
+                document.getElementById(`chart_container_${chartIndex}`).innerHTML = "";
+                chart.container(`chart_container_${chartIndex}`).draw();
             })
     }
 
