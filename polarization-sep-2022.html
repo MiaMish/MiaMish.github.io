@@ -23,6 +23,18 @@
     <label for="num_of_iterations">Num of Iterations:</label><select id="num_of_iterations" onchange="fillExperimentsDropDown()">
     </select>
 </div>
+<div class="center">
+    <label for="min_mio">Min mio</label>
+    <input type="number" step="0.01" id="min_mio" value="0" onchange="fillExperimentsDropDown()">
+    <label for="max_mio">Max mio</label>
+    <input type="number" step="0.01" id="max_mio" value="1" onchange="fillExperimentsDropDown()">
+</div>
+<div class="center">
+    <label for="min_epsilon">Min epsilon</label>
+    <input type="number" step="0.01" id="min_epsilon" value="0" onchange="fillExperimentsDropDown()">
+    <label for="max_epsilon">Max epsilon</label>
+    <input type="number" step="0.01" id="max_epsilon" value="1" onchange="fillExperimentsDropDown()">
+</div>
 <hr>
 <div class="center">
     <div class="series_config">
@@ -207,8 +219,18 @@
                     && experimentConfig.config_id !== ""
                     && experimentConfig["simulation_type"] === document.getElementById("simulation_type").value
                     && experimentConfig["num_of_agents"] === document.getElementById("num_of_agents").value
-                    && experimentConfig["num_iterations"] === document.getElementById("num_of_iterations").value)
-                .map(experimentConfig => {
+                    && experimentConfig["num_iterations"] === document.getElementById("num_of_iterations").value);
+            if (document.getElementById("min_mio").value && document.getElementById("max_mio").value) {
+                options_for_select = options_for_select
+                    .filter(experimentConfig => experimentConfig["mio"] >= document.getElementById("min_mio").value
+                        && experimentConfig["mio"] <= document.getElementById("max_mio").value);
+            }
+            if (document.getElementById("min_epsilon").value && document.getElementById("max_epsilon").value) {
+                options_for_select = options_for_select
+                    .filter(experimentConfig => experimentConfig["epsilon"] >= document.getElementById("min_epsilon").value
+                        && experimentConfig["epsilon"] <= document.getElementById("max_epsilon").value);
+            }
+            options_for_select = options_for_select.map(experimentConfig => {
                     let configId = experimentConfig["config_id"];
                     let displayName = experimentConfig.display_name;
                     let experimentsForConfig = experimentResults.filter(experiment_result => experiment_result["config_id"] === configId)
