@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>September 2022</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.1.0/papaparse.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-base.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-data-adapter.min.js"></script>
+    <link href="style_oct_2022.css" rel="stylesheet">
+    <script src="polarization/oct/helpers.js"></script>
+    <script src="polarization/oct/constants.js"></script>
+    <script src="polarization/oct/initialization.js"></script>
+    <script src="polarization/oct/charts.js"></script>
+</head>
+<body>
+
+<hr>
+<div id="high_level_filters">
+</div>
+
+<hr>
+<div id="series_configs">
+</div>
+
+<hr>
+<div id="measurement_types">
+</div>
+
+<hr>
+<div>
+    <button onclick="generateCharts()">
+        Create Charts!
+    </button>
+</div>
+
+<hr>
+<div class="center">
+    <div class="chart_container" id="chart_container_0"></div>
+    <div class="chart_container" id="chart_container_1"></div>
+</div>
+<div class="center">
+    <div class="chart_container" id="chart_container_2"></div>
+    <div class="chart_container" id="chart_container_3"></div>
+</div>
+
+</body>
+<script>
+    initializePage();
+</script>
+</html>
