@@ -136,7 +136,7 @@ function fillMeasurementTypeCheckbox() {
         measurementTypeCheckbox.id = measurementCheckboxElementId(measurementType.name);
         measurementTypeCheckbox.className = MEASUREMENT_TYPE_CHECKBOX_CLASS_NAME;
         measurementTypeCheckbox.addEventListener("click", () => {
-            let myCheckbox = measurementCheckboxElementId(measurementType.name);
+            let myCheckbox = document.getElementById(measurementCheckboxElementId(measurementType.name));
             if (!myCheckbox.checked) {
                 return;
             }
