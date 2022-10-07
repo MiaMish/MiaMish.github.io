@@ -10,12 +10,16 @@ function zipExperimentsConfigsAndID(configIDs, researchFilter, experimentResults
     });
 }
 
-function chartMeasurements(measurementsToChart, configIDs) {
+function chartMeasurements(configIDs) {
+    let measurementsToChart = getMeasurementsToChart();
     return data => {
         for (let i = 0; i < measurementsToChart.length; i++) {
             let chart = anychart.scatter();
             for (let seriesIndex = 0; seriesIndex < configIDs.length; seriesIndex++) {
-                let seriesData = data.filter(item => item.experiment_id === configIDs[seriesIndex]["experimentId"] && item.measurement_type === measurementsToChart[i]).map(item => ({
+                let seriesData = data.filter(item =>
+                    item.experiment_id === configIDs[seriesIndex]["experimentId"]
+                    && item.measurement_type === measurementsToChart[i]
+                ).map(item => ({
                     x: item.x,
                     value: item.value
                 }));
@@ -28,78 +32,82 @@ function chartMeasurements(measurementsToChart, configIDs) {
             document.getElementById(`chart_container_${i}`).innerHTML = "";
             chart.container(`chart_container_${i}`).draw();
         }
-
     };
 }
 
-function generateCharts() {
+function filterExperiments(experimentConfigs) {
+    let configIDs = experimentConfigs.filter(experimentConfig => experimentConfig["config_id"] && experimentConfig["config_id"] !== "");
+    HIGH_LEVEL_FILTERS.forEach(highLevelFilter => {
+
+        let valueNormalizationFunc = x => x;
+        if (highLevelFilter["valueNormalizationFunc"]) {
+            valueNormalizationFunc = highLevelFilter["valueNormalizationFunc"];
+        }
+
+        if (highLevelFilter["experimentConfigColumn"]) {
+            let valueToFilter = valueNormalizationFunc(document.getElementById(`${highLevelFilter.name}`).value);
+            configIDs = configIDs.filter(experimentConfig => valueNormalizationFunc(experimentConfig[highLevelFilter["experimentConfigColumn"]]) === valueToFilter);
+        }
+    });
+    SERIES_FILTERS.forEach(seriesFilter => {
+        if (!seriesFilter["experimentConfigColumn"]) {
+            return;
+        }
+        let valueNormalizationFunc = x => x;
+        if (seriesFilter["valueNormalizationFunc"]) {
+            valueNormalizationFunc = seriesFilter["valueNormalizationFunc"];
+        }
+        let is_fixed = !document.getElementById(researchFixedToggleElementId(seriesFilter.name)).checked;
+        if (is_fixed) {
+            let valueToFilter = valueNormalizationFunc(document.getElementById(fixedFilterSelectElementId(seriesFilter.name)).value);
+            configIDs = configIDs.filter(experimentConfig => valueNormalizationFunc(experimentConfig[seriesFilter["experimentConfigColumn"]]) === valueToFilter)
+        } else {
+            let parentDiv = document.getElementById(researchFilterDivElementId(seriesFilter.name));
+            let inValueList = [];
+            Array.prototype.forEach.call(parentDiv.getElementsByClassName(RESEARCH_FILTER_OPTION_CHECKBOX_CLASS_NAME), researchInputCheckbox => {
+                if (researchInputCheckbox.checked) {
+                    let valueToFilter = valueNormalizationFunc(researchInputCheckbox.value);
+                    inValueList.push(valueToFilter);
+                }
+            });
+            configIDs = configIDs.filter(experimentConfig => inValueList.includes(valueNormalizationFunc(experimentConfig[seriesFilter["experimentConfigColumn"]])));
+
+        }
+    });
+    return configIDs;
+}
+
+function getResearchFilter() {
     let researchFilter;
     SERIES_FILTERS.forEach(seriesFilter => {
         if (document.getElementById(researchFixedToggleElementId(seriesFilter.name)).checked) {
             researchFilter = seriesFilter;
         }
     });
+    return researchFilter;
+}
+
+function getMeasurementsToChart() {
     let measurementsToChart = [];
     Array.prototype.forEach.call(document.getElementsByClassName(MEASUREMENT_TYPE_CHECKBOX_CLASS_NAME), checkbox => {
         if (checkbox.checked) {
             measurementsToChart.push(checkbox.value);
         }
     });
+    return measurementsToChart;
+}
 
+function generateCharts() {
     getCsvData(BASE_PATH + "experiment_configs")
         .then(filterExperiments)
         .then(filteredConfigs => {
             return getCsvData(BASE_PATH + "experiment_result")
-                .then(experimentResults => zipExperimentsConfigsAndID(filteredConfigs, researchFilter, experimentResults))
-            })
+                .then(experimentResults => zipExperimentsConfigsAndID(filteredConfigs, getResearchFilter(), experimentResults))
+        })
         .then(configIDs => {
-            getCsvData(BASE_PATH + "measurements")
-                .then(chartMeasurements(measurementsToChart, configIDs))
+            Promise.all(configIDs.map(element => getCsvData(`${BASE_PATH}${element["experimentId"][0]}/${element["experimentId"][1]}/measurements`)))
+                .then(values => values.flatMap(x => x))
+                .then(chartMeasurements(configIDs))
         });
-
-    function filterExperiments(experimentConfigs) {
-        let configIDs = experimentConfigs.filter(experimentConfig => experimentConfig["config_id"] && experimentConfig["config_id"] !== "");
-
-        HIGH_LEVEL_FILTERS.forEach(highLevelFilter => {
-
-            let valueNormalizationFunc = x => x;
-            if (highLevelFilter["valueNormalizationFunc"]) {
-                valueNormalizationFunc = highLevelFilter["valueNormalizationFunc"];
-            }
-
-            if (highLevelFilter["experimentConfigColumn"]) {
-                let valueToFilter = valueNormalizationFunc(document.getElementById(`${highLevelFilter.name}`).value);
-                configIDs = configIDs.filter(experimentConfig => valueNormalizationFunc(experimentConfig[highLevelFilter["experimentConfigColumn"]]) === valueToFilter);
-            }
-        });
-
-        SERIES_FILTERS.forEach(seriesFilter => {
-            if (!seriesFilter["experimentConfigColumn"]) {
-                return;
-            }
-            let valueNormalizationFunc = x => x;
-            if (seriesFilter["valueNormalizationFunc"]) {
-                valueNormalizationFunc = seriesFilter["valueNormalizationFunc"];
-            }
-            let is_fixed = !document.getElementById(researchFixedToggleElementId(seriesFilter.name)).checked;
-            if (is_fixed) {
-                let valueToFilter = valueNormalizationFunc(document.getElementById(fixedFilterSelectElementId(seriesFilter.name)).value);
-                configIDs = configIDs.filter(experimentConfig => valueNormalizationFunc(experimentConfig[seriesFilter["experimentConfigColumn"]]) === valueToFilter)
-            } else {
-                let parentDiv = document.getElementById(researchFilterDivElementId(seriesFilter.name));
-                let inValueList = [];
-                Array.prototype.forEach.call(parentDiv.getElementsByClassName(RESEARCH_FILTER_OPTION_CHECKBOX_CLASS_NAME), researchInputCheckbox => {
-                    if (researchInputCheckbox.checked) {
-                        let valueToFilter = valueNormalizationFunc(researchInputCheckbox.value);
-                        inValueList.push(valueToFilter);
-                    }
-                });
-                configIDs = configIDs.filter(experimentConfig => inValueList.includes(valueNormalizationFunc(experimentConfig[seriesFilter["experimentConfigColumn"]])));
-
-            }
-        });
-        return configIDs;
-    }
-
 
 }

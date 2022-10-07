@@ -18,7 +18,7 @@ function getCsvData(path_to_csv) {
 
 function normalizeNumber(x) {
     if (x === "") {
-        return "0.00";
+        return "0.0000";
     }
-    return parseFloat(x).toFixed(2);
+    return parseFloat(x).toFixed(4);
 }
