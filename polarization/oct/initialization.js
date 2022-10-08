@@ -160,8 +160,17 @@ function fillMeasurementTypeCheckbox() {
     });
 }
 
+function setDefaultChartsConfig() {
+    // click on the first fixed/research toggle
+    document.getElementsByClassName(RESEARCH_FIXED_TOGGLE_CLASS_NAME).item(0).click();
+
+    // click on the first measurement type
+    document.getElementsByClassName(MEASUREMENT_TYPE_CHECKBOX_CLASS_NAME).item(0).click();
+}
+
 function initializePage() {
     fillHighLevelFilters();
     fillSeriesFilters();
     fillMeasurementTypeCheckbox();
+    setDefaultChartsConfig();
 }

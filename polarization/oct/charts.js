@@ -36,7 +36,11 @@ function chartMeasurements(configIDs) {
 }
 
 function filterExperiments(experimentConfigs) {
-    let configIDs = experimentConfigs.filter(experimentConfig => experimentConfig["config_id"] && experimentConfig["config_id"] !== "");
+    let configIDs = experimentConfigs.filter(experimentConfig =>
+        experimentConfig["config_id"]
+        && experimentConfig["config_id"] !== ""
+        && experimentConfig["status"] === "RunStatus.SUCCESS");
+
     HIGH_LEVEL_FILTERS.forEach(highLevelFilter => {
 
         let valueNormalizationFunc = x => x;
@@ -49,6 +53,7 @@ function filterExperiments(experimentConfigs) {
             configIDs = configIDs.filter(experimentConfig => valueNormalizationFunc(experimentConfig[highLevelFilter["experimentConfigColumn"]]) === valueToFilter);
         }
     });
+
     SERIES_FILTERS.forEach(seriesFilter => {
         if (!seriesFilter["experimentConfigColumn"]) {
             return;
@@ -60,7 +65,7 @@ function filterExperiments(experimentConfigs) {
         let is_fixed = !document.getElementById(researchFixedToggleElementId(seriesFilter.name)).checked;
         if (is_fixed) {
             let valueToFilter = valueNormalizationFunc(document.getElementById(fixedFilterSelectElementId(seriesFilter.name)).value);
-            configIDs = configIDs.filter(experimentConfig => valueNormalizationFunc(experimentConfig[seriesFilter["experimentConfigColumn"]]) === valueToFilter)
+            configIDs = configIDs.filter(experimentConfig => valueNormalizationFunc(experimentConfig[seriesFilter["experimentConfigColumn"]]) === valueToFilter);
         } else {
             let parentDiv = document.getElementById(researchFilterDivElementId(seriesFilter.name));
             let inValueList = [];
@@ -71,9 +76,9 @@ function filterExperiments(experimentConfigs) {
                 }
             });
             configIDs = configIDs.filter(experimentConfig => inValueList.includes(valueNormalizationFunc(experimentConfig[seriesFilter["experimentConfigColumn"]])));
-
         }
     });
+
     return configIDs;
 }
 
