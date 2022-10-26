@@ -13,7 +13,8 @@ const HIGH_LEVEL_FILTERS = [
         name: "simulation_type_filter",
         displayName: "Simulation Type",
         options: ["SIMILARITY", "REPULSIVE", "ASSIMILATION"],
-        experimentConfigColumn: "simulation_type"
+        experimentConfigColumn: "simulation_type",
+        description: ""
     },
     {
         name: "polarization_reduction_mechanism_filter",
@@ -23,7 +24,7 @@ const HIGH_LEVEL_FILTERS = [
     {
         name: "iterations_num_filter",
         displayName: "Number of Iterations",
-        options: [30, 50],
+        options: [10000],
         experimentConfigColumn: "num_iterations"
     },
 ];
@@ -31,9 +32,9 @@ const SERIES_FILTERS = [
     {
         name: "num_of_agents_filter",
         displayName: "Number of Agents",
-        options: [15, 30],
-        defaultFixedOption: 30,
-        defaultSelectedResearchOptions: [15, 30],
+        options: [100],
+        defaultFixedOption: 100,
+        defaultSelectedResearchOptions: [100],
         experimentConfigColumn: "num_of_agents",
         valueNormalizationFunc: x => parseInt(x),
     },
@@ -49,9 +50,9 @@ const SERIES_FILTERS = [
     {
         name: "num_of_repetitions",
         displayName: "Number of Repetitions",
-        options: [5, 10],
-        defaultFixedOption: 10,
-        defaultSelectedResearchOptions: [5, 10],
+        options: [400],
+        defaultFixedOption: 400,
+        defaultSelectedResearchOptions: [400],
         experimentConfigColumn: "num_of_repetitions",
         valueNormalizationFunc: x => parseInt(x),
     },
