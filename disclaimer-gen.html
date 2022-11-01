@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="disclaimer_element">
+
+</div>
+<button type="button" onclick="genDisclaimer()">Click Me!</button>
+</body>
+<script>
+    const DISCLAIMERS = [
+        "זה לא ממש מלוטש",
+        "הסעיף הראשון לא משהו. וגם השני. והשלישי. גם הרביעי והחמישי. אוי.",
+        "יש כמה חורים קטנים בעלילה. אבל לא יותר גדולים ",
+        "בהינתן שרק אני, המנחה, השופט ואמא שלי קוראים את זה, אז זה ממש אחלה.",
+        "יש מצב שיש כה באגים בקוד ואז כל האנליזה לא נכונה והמסקנות נשברות.",
+        "ייתכן ויש כמה הנחות לא לגיטימיות שמערערות את זכות הקיום של הטיעון",
+        "זה טיוטה 0.1!",
+        "יש לי רשימה של מיליון דברים לתקן.",
+        "אני יוצאת מתוך נקודת הנחה שאחרי העריכות לא תישאר מילה אחת ממה שכתוב כאן אז זה פסדר",
+        "זה רק אאאוטליין!",
+        "זה פחות או יותר מה שאני רוצה להגיד אבל כשהפרק הזה יהיה גדול הוא יהיה מבוסס!",
+        "החתולה שלי הכריחה אותי להגיש."
+    ];
+
+    function genDisclaimer() {
+        let disclaimerElement = document.getElementById("disclaimer_element");
+        disclaimerElement.innerText = DISCLAIMERS[Math.floor(Math.random() * DISCLAIMERS.length)];
+    }
+</script>
+</html>
